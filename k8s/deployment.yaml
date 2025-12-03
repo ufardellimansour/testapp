@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-app
+  namespace: test-app
+  labels:
+    app: test-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        app: test-app
+        version: v1
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25-alpine
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 3
+        volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html
+        configMap:
+          name: test-app-html
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-app-html
+  namespace: test-app
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Argo CD</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            .container {
+                text-align: center;
+                background: white;
+                padding: 50px;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            }
+            h1 {
+                color: #667eea;
+                margin-bottom: 20px;
+            }
+            .status {
+                color: #28a745;
+                font-size: 24px;
+                margin: 20px 0;
+            }
+            .info {
+                color: #6c757d;
+                margin: 10px 0;
+            }
+            .emoji {
+                font-size: 64px;
+                margin: 20px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="emoji">🚀</div>
+            <h1>Application de Test Argo CD</h1>
+            <div class="status">✅ Déploiement réussi !</div>
+            <div class="info">Version: v1.0.0</div>
+            <div class="info">Replicas: 2</div>
+            <div class="info">Hostname: <span id="hostname"></span></div>
+        </div>
+        <script>
+            document.getElementById('hostname').textContent = window.location.hostname;
+        </script>
+    </body>
+    </html>
