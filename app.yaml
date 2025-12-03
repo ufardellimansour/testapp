@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: test-app
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  source:
+    repoURL: https://github.com/VOTRE-USERNAME/VOTRE-REPO.git  # ⚠️ MODIFIER CETTE URL
+    targetRevision: main  # ou master selon votre branche principale
+    path: k8s
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: test-app
+  
+  syncPolicy:
+    automated:
+      prune: true      # Supprime les ressources qui ne sont plus dans Git
+      selfHeal: true   # Corrige automatiquement les dérives
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=true  # Crée automatiquement le namespace si nécessaire
+    - PrunePropagationPolicy=foreground
+    - PruneLast=true
+    
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
