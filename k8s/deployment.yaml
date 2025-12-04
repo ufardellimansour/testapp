@@ -53,7 +53,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test-app-html
-  namespace: test-app
+  namespace: test-app-dev
 data:
   index.html: |
     <!DOCTYPE html>
