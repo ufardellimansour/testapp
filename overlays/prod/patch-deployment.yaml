@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-app
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        version: v1-stable
+    spec:
+      containers:
+      - name: nginx
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "400m"

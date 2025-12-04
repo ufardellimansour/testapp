@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+  - ../../base
+
+commonLabels:
+  environment: preprod
+  app.kubernetes.io/instance: test-app-preprod
+
+namespace: test-app-preprod
+
+nameSuffix: -preprod
+
+patchesStrategicMerge:
+  - patch-deployment.yaml
+
+images:
+  - name: ghcr.io/linuxserver/nginx
+    newTag: latest-beta-r3-ls338
